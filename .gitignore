@@ -21,3 +21,9 @@ contextus-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+.codellm
+
+.elixir_ls
+
+contextus
