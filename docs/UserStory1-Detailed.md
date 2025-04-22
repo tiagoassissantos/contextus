@@ -16,19 +16,25 @@
 ### Tasks Breakdown for Development:
 
 #### Task 1: Define Initialization Command
-- [ ] Specify the exact CLI syntax (`contextus init <directory>`) clearly.
-- [ ] Determine command-line argument handling (mandatory/optional arguments, validation).
+- [X ] Specify the exact CLI syntax (`contextus init <directory>`) clearly.
+- [X] Determine command-line argument handling (mandatory/optional arguments, validation).
 
 #### Task 2: Project Directory Validation
-- [ ] Implement logic to check if the given directory exists.
-- [ ] Verify directory permissions (read/write permissions).
-- [ ] Write test cases to ensure directory validation logic works correctly.
+- [X] Implement logic to check if the given directory exists.
+- [X] Verify directory permissions (read/write permissions).
+- [X] Write test cases to ensure directory validation logic works correctly.
 
 #### Task 3: Configuration and Initial Directory Structure Setup
+- [ ] Write unit tests ensuring configuration files and directories are created correctly.
 - [ ] Define standard initial configuration files (e.g., `.contextus/config.json`).
 - [ ] Define necessary subdirectories structure (e.g., `.contextus/data`, `.contextus/logs`).
 - [ ] Develop functionality to create the initial files and directories upon initialization.
-- [ ] Write unit tests ensuring configuration files and directories are created correctly.
+
+Based on the task description, I recommend splitting the functionality between modules for better organization and separation of concerns. Here's my suggestion:
+
+Keep Contextus.Init as the main orchestrator module
+Create a new module Contextus.Init.Config for configuration-related operations
+Create a new module Contextus.Init.Structure for directory structure operations
 
 #### Task 4: Success and Error Messaging
 - [ ] Implement clear and user-friendly success messages upon completion of initialization.
