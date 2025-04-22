@@ -59,5 +59,47 @@ defmodule Contextus.CLITest do
 
       assert io =~ "Directory does not exist: dir_not_exist"
     end
+
+    test "handles directory without write permissions" do
+      # Create a temporary directory with read-only permissions for testing
+      test_dir = "test_read_only_dir"
+      File.mkdir_p!(test_dir)
+      # Make the directory read-only (no write permissions)
+      File.chmod!(test_dir, 0o444)
+
+      try do
+        io = capture_io(fn ->
+          result = CLI.main(["init", test_dir])
+          assert result == :error
+        end)
+
+        assert io =~ "Permission denied: #{test_dir}"
+      after
+        # Clean up: restore permissions and remove the directory
+        File.chmod!(test_dir, 0o755)
+        File.rm_rf!(test_dir)
+      end
+    end
+
+    test "handles directory without read permissions" do
+      # Create a temporary directory with write-only permissions for testing
+      test_dir = "test_write_only_dir"
+      File.mkdir_p!(test_dir)
+      # Make the directory write-only (no read permissions)
+      File.chmod!(test_dir, 0o222)
+
+      try do
+        io = capture_io(fn ->
+          result = CLI.main(["init", test_dir])
+          assert result == :error
+        end)
+
+        assert io =~ "Permission denied: #{test_dir}"
+      after
+        # Clean up: restore permissions and remove the directory
+        File.chmod!(test_dir, 0o755)
+        File.rm_rf!(test_dir)
+      end
+    end
   end
 end
