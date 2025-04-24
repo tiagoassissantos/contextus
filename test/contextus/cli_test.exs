@@ -19,21 +19,41 @@ defmodule Contextus.CLITest do
 
   describe "run/1" do
     test "TC2: Dispatch to init handler" do
-      io = capture_io(fn ->
-        assert CLI.run({:ok, {:init, "."}}) == :ok
-      end)
+      # Create a temporary directory for testing
+      test_dir = "test_run_dir"
+      File.rm_rf!(test_dir)
+      File.mkdir_p!(test_dir)
 
-      assert io =~ "Initializing Contextus in directory: ."
+      try do
+        io = capture_io(fn ->
+          assert CLI.run({:ok, {:init, test_dir}}) == :ok
+        end)
+
+        assert io =~ "Initializing Contextus in directory: #{test_dir}"
+      after
+        # Clean up
+        File.rm_rf!(test_dir)
+      end
     end
   end
 
   describe "main/1" do
     test "TC3: End-to-end happy path" do
-      io = capture_io(fn ->
-        assert CLI.main(["init", "."]) == :ok
-      end)
+      # Create a temporary directory for testing
+      test_dir = "test_init_dir"
+      File.rm_rf!(test_dir)
+      File.mkdir_p!(test_dir)
 
-      assert io =~ "Initializing Contextus in directory: ."
+      try do
+        io = capture_io(fn ->
+          assert CLI.main(["init", test_dir]) == :ok
+        end)
+
+        assert io =~ "Initializing Contextus in directory: #{test_dir}"
+      after
+        # Clean up
+        File.rm_rf!(test_dir)
+      end
     end
 
     test "handles missing directory argument" do
@@ -98,6 +118,44 @@ defmodule Contextus.CLITest do
       after
         # Clean up: restore permissions and remove the directory
         File.chmod!(test_dir, 0o755)
+        File.rm_rf!(test_dir)
+      end
+    end
+
+    test "creates standard configuration structure" do
+      # Create a temporary directory for testing
+      test_dir = "test_config_dir"
+      File.rm_rf!(test_dir)
+      File.mkdir_p!(test_dir)
+
+      try do
+        io = capture_io(fn ->
+          assert CLI.main(["init", test_dir]) == :ok
+        end)
+
+        assert io =~ "Initializing Contextus in directory: #{test_dir}"
+
+        # Verify configuration structure
+        config_dir = Path.join(test_dir, ".contextus")
+        config_file = Path.join(config_dir, "config.json")
+        data_dir = Path.join(config_dir, "data")
+        logs_dir = Path.join(config_dir, "logs")
+
+        assert File.exists?(config_dir)
+        assert File.exists?(config_file)
+        assert File.exists?(data_dir)
+        assert File.exists?(logs_dir)
+
+        # Verify config file content
+        {:ok, config_content} = File.read(config_file)
+        {:ok, parsed_config} = Jason.decode(config_content)
+
+        assert Map.has_key?(parsed_config, "version")
+        assert Map.has_key?(parsed_config, "project")
+        assert Map.has_key?(parsed_config, "analysis")
+        assert Map.has_key?(parsed_config, "storage")
+      after
+        # Clean up
         File.rm_rf!(test_dir)
       end
     end

@@ -25,5 +25,5 @@ contextus-*.tar
 .codellm
 
 .elixir_ls
-
 contextus
+.contextus

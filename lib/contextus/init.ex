@@ -4,6 +4,7 @@ defmodule Contextus.Init do
   """
 
   require Logger
+  alias Contextus.Init.Config
 
   @doc """
   Initialize a new Contextus project in the specified directory.
@@ -28,9 +29,18 @@ defmodule Contextus.Init do
       # All checks passed, proceed with initialization
       true ->
         IO.puts("Initializing Contextus in directory: #{dir}")
-        # Here we would typically create necessary files and directories
-        # For now, we'll just return :ok to pass the test
-        :ok
+        case Config.create_standard_config(dir) do
+          :ok -> :ok
+          {:error, :config_exists} ->
+            IO.puts("Configuration already exists in #{dir}")
+            :error
+          {:error, :permission_denied} ->
+            IO.puts("Permission denied while creating configuration in #{dir}")
+            :error
+          {:error, reason} ->
+            IO.puts("Error creating configuration: #{inspect(reason)}")
+            :error
+        end
     end
   end
 
