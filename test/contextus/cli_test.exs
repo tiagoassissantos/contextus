@@ -159,5 +159,25 @@ defmodule Contextus.CLITest do
         File.rm_rf!(test_dir)
       end
     end
+
+    test "handles existing configuration" do
+      test_dir = "test_existing_config_dir"
+      File.rm_rf!(test_dir)
+      File.mkdir_p!(test_dir)
+
+      try do
+        assert CLI.main(["init", test_dir]) == :ok
+
+        io = capture_io(fn ->
+          assert CLI.main(["init", test_dir]) == :error
+        end)
+
+        assert io =~ "Configuration already exists in #{test_dir}"
+      after
+        # Clean up
+        File.rm_rf!(test_dir)
+      end
+    end
+
   end
 end
